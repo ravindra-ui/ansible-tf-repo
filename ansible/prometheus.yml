@@ -1,0 +1,29 @@
+---
+- hosts: localhost 
+  vars:
+     helm_chart_url: "https://prometheus-community.github.io/helm-charts"
+     repo_name: "prometheusrepo"
+     release_name: "prometheuschart"
+  tasks:
+    - name: Create a k8s namespace
+      kubernetes.core.k8s:
+        name: prometheus
+        api_version: v1
+        kind: Namespace
+        state: present    
+    - name: Add stable chart repo
+      kubernetes.core.helm_repository:
+         name: "{{repo_name}}"
+         repo_url: "{{helm_chart_url}}"
+    - name: update repo
+      command: helm repo update 
+    - name: Deploy latest version of prometheus chart
+      kubernetes.core.helm:
+         name: "{{release_name}}"
+         chart_ref: '"{{repo_name}}"/prometheus'
+         release_namespace: prometheus
+         state: present
+         when: true 
+    - name: upgrade  helm chart
+      command: 'helm upgrade {{release_name}} {{repo_name}}/prometheus -n prometheus'   
+    
