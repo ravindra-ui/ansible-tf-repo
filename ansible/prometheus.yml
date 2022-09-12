@@ -24,6 +24,6 @@
          release_namespace: prometheus
          state: present
          when: true 
-    - name: upgrade  helm chart
+    - name: upgrade  helm chart latest
       command: 'helm upgrade {{release_name}} {{repo_name}}/prometheus -n prometheus'   
     
